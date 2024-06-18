@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{%block body%}
+
+<div class="container my-3">
+    <h2>Enter Your Link</h2>
+    <form action="/fetch_comments" method="POST">
+        <div class="mb-3">
+            <label for="link" class="form-label">Paste Here</label>
+            <input type="text" class="form-control" id="link" name="link" aria-describedby="emailHelp">
+        </div>
+        <button type="submit" class="btn btn-dark">Submit</button>
+    </form>
+</div>
+
+<div class="container my-5">
+    <h2>Comments</h2>
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% elif comments %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">S.No.</th>
+                <th scope="col">Author</th>
+                <th scope="col">Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set comments_no = limited_comments|list %}
+            {% for comment in comments_no %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ comment.author }}</td>
+                <td>{{ comment.comment }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="container my-5">
+        <div class="alert alert-dark" role="alert">
+            {{response}}
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="card border-dark mb-3" style="max-width: 30rem;">
+            <div class="card-header">Bar Graph</div>
+            <div class="card-body">
+                <h5 class="card-title">Sentiment Analysis</h5>
+                <p class="card-text">
+                <div>
+                    <canvas id="barChart"></canvas>
+                </div>
+    
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+                <script>
+                    const barCtx = document.getElementById('barChart').getContext('2d');
+    
+                    new Chart(barCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Positive Comments', 'Negative Comments', 'Neutral Comments'],
+                            datasets: [{
+                                label: "Comments",
+                                data: [
+                                    "{{ positive_count }}",
+                                    "{{ negative_count }}",
+                                    "{{ neutral_count }}"
+                                ],
+                                borderWidth: 1,
+                                backgroundColor: ['rgba(5, 180, 25, 0.2)', 'rgba(203, 8, 21, 0.2)', 'rgba(255, 206, 86, 0.2)'],
+                                borderColor: ['rgba(5, 180, 25, 1)', 'rgba(203, 8, 21, 1)', 'rgba(255, 206, 86, 1)']
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                </script>
+            </div>
+            </p>
+        </div>
+    </div>
+    
+    <div class="container my-5">
+        <div class="card border-dark mb-3" style="max-width: 30rem;">
+            <div class="card-header">Doughnut Chart</div>
+            <div class="card-body">
+                <h5 class="card-title">Sentiment Analysis</h5>
+                <p class="card-text">
+                <div>
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+    
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+                <script>
+                    const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+    
+                    new Chart(doughnutCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Positive Comments', 'Negative Comments', 'Neutral Comments'],
+                            datasets: [{
+                                label: 'Comments',
+                                data: [
+                                    "{{ positive_count }}",
+                                    "{{ negative_count }}",
+                                    "{{ neutral_count }}"
+                                ],
+                                backgroundColor: ['rgba(5, 180, 25, 0.7)', 'rgba(203, 8, 21, 0.7)', 'rgba(255, 206, 86, 0.7)'],
+                                hoverOffset: 4
+                            }]
+                        }
+                    });
+                </script>
+            </div>
+            </p>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-dark" role="alert">
+        No comments to display.
+    </div>
+    {% endif %}
+</div>
+
+{% endblock body%}
