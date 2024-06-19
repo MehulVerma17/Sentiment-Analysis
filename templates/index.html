@@ -1,63 +1,97 @@
 {% extends 'base.html' %}
 
-{%block body%}
+{% block body %}
 
 <div class="container my-3">
     <h2>Enter Your Link</h2>
     <form action="/fetch_comments" method="POST">
         <div class="mb-3">
             <label for="link" class="form-label">Paste Here</label>
-            <input type="text" class="form-control" id="link" name="link" aria-describedby="emailHelp">
+            <input type="text" class="form-control" id="link" name="link">
         </div>
         <button type="submit" class="btn btn-dark">Submit</button>
     </form>
 </div>
 
 <div class="container my-5">
-    <h2>Comments</h2>
+    <h2>Few Comments</h2>
     {% if error %}
     <p style="color: red;">{{ error }}</p>
     {% elif comments %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">S.No.</th>
-                <th scope="col">Author</th>
-                <th scope="col">Comment</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% set comments_no = limited_comments|list %}
-            {% for comment in comments_no %}
-            <tr>
-                <th scope="row">{{ loop.index }}</th>
-                <td>{{ comment.author }}</td>
-                <td>{{ comment.comment }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div class="container my-5">
-        <div class="alert alert-dark" role="alert">
-            {{response}}
+    <!-- Section for limited comments -->
+    <div id="limited-comments">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">S.No.</th>
+                    <th scope="col">Author</th>
+                    <th scope="col">Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in limited_comments %}
+                <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>{{ comment.author }}</td>
+                    <td>{{ comment.comment }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Section for all comments, initially hidden -->
+    <div id="all-comments" style="display: none;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">S.No.</th>
+                    <th scope="col">Author</th>
+                    <th scope="col">Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in comments %}
+                <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>{{ comment.author }}</td>
+                    <td>{{ comment.comment }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Checkbox to toggle between limited and all comments -->
+    <div class="container my-3">
+        <div class="input-group mb-3">
+            <div class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" id="toggle-comments" aria-label="Checkbox for following text input">
+                <label for="toggle-comments"> See all Comments</label>
+            </div>
         </div>
     </div>
-    
+
+    <div class="container my-4">
+        <div class="alert alert-dark" role="alert">
+            {{ response }}
+        </div>
+    </div>
+
+    <!-- Bar Chart Section -->
     <div class="container">
         <div class="card border-dark mb-3" style="max-width: 30rem;">
             <div class="card-header">Bar Graph</div>
             <div class="card-body">
                 <h5 class="card-title">Sentiment Analysis</h5>
-                <p class="card-text">
                 <div>
                     <canvas id="barChart"></canvas>
                 </div>
-    
+
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
                 <script>
                     const barCtx = document.getElementById('barChart').getContext('2d');
-    
+
                     new Chart(barCtx, {
                         type: 'bar',
                         data: {
@@ -84,25 +118,23 @@
                     });
                 </script>
             </div>
-            </p>
         </div>
     </div>
-    
+
+    <!-- Doughnut Chart Section -->
     <div class="container my-5">
         <div class="card border-dark mb-3" style="max-width: 30rem;">
             <div class="card-header">Doughnut Chart</div>
             <div class="card-body">
                 <h5 class="card-title">Sentiment Analysis</h5>
-                <p class="card-text">
                 <div>
                     <canvas id="doughnutChart"></canvas>
                 </div>
-    
+
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
                 <script>
                     const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
-    
+
                     new Chart(doughnutCtx, {
                         type: 'doughnut',
                         data: {
@@ -121,7 +153,6 @@
                     });
                 </script>
             </div>
-            </p>
         </div>
     </div>
     {% else %}
@@ -131,4 +162,19 @@
     {% endif %}
 </div>
 
-{% endblock body%}
+<script>
+    // JavaScript to toggle the visibility of limited and all comments
+    document.getElementById('toggle-comments').addEventListener('change', function() {
+        var limitedComments = document.getElementById('limited-comments');
+        var allComments = document.getElementById('all-comments');
+        if (this.checked) {
+            limitedComments.style.display = 'none';
+            allComments.style.display = 'block';
+        } else {
+            limitedComments.style.display = 'block';
+            allComments.style.display = 'none';
+        }
+    });
+</script>
+
+{% endblock %}
